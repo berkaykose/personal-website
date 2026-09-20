@@ -6,6 +6,7 @@ import { formatPostDate } from '@/lib/formatDate'
 import FadeIn from '@/components/FadeIn'
 import NotFoundContent from '@/components/NotFoundContent'
 import ContentBlockRenderer from '@/components/ContentBlockRenderer'
+import { buildMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,9 +20,17 @@ export async function generateMetadata({
   const article = await fetchPublishedArticleBySlug(locale, slug)
   if (!article) {
     const t = await getTranslations('metadata')
-    return { title: t('not_found_title') }
+    return { title: t('not_found_title'), robots: { index: false } }
   }
-  return { title: article.title }
+  return buildMetadata({
+    locale,
+    path: `/writing/${slug}`,
+    title: article.title,
+    description: article.excerpt,
+    // Her locale kendi slug'ına sahip olabilir (ArticleTranslation modeli) —
+    // aynı slug'ın diğer locale'de var olduğunu varsaymak yanlış olur.
+    skipLanguageAlternates: true,
+  })
 }
 
 export default async function WritingPostPage({

@@ -4,12 +4,22 @@ import { Link } from '@/i18n/navigation'
 import { fetchPublishedArticles } from '@/lib/posts/api'
 import { formatPostDate } from '@/lib/formatDate'
 import FadeIn from '@/components/FadeIn'
+import { buildMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('metadata')
-  return { title: t('writing_title') }
+  const [t, tWriting, locale] = await Promise.all([
+    getTranslations('metadata'),
+    getTranslations('writing'),
+    getLocale(),
+  ])
+  return buildMetadata({
+    locale,
+    path: '/writing',
+    title: t('writing_title'),
+    description: tWriting('subtitle'),
+  })
 }
 
 export default async function WritingPage() {

@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
+  images: {
+    // WebP'ye ek olarak AVIF de üretir — destekleyen tarayıcılarda genelde
+    // %20-30 daha küçük dosya, next/image otomatik olarak Accept header'ına
+    // göre en uygununu seçiyor.
+    formats: ['image/avif', 'image/webp'],
+  },
+  poweredByHeader: false,
 }
 
 export default withNextIntl(nextConfig)

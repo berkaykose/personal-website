@@ -7,9 +7,9 @@ import Link from 'next/link'
 import { Instrument_Sans, Playfair_Display, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-const instrumentSans = Instrument_Sans({ subsets: ['latin'], variable: '--font-instrument-sans' })
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
-const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains' })
+const instrumentSans = Instrument_Sans({ subsets: ['latin', 'latin-ext'], variable: '--font-instrument-sans' })
+const playfair = Playfair_Display({ subsets: ['latin', 'latin-ext'], variable: '--font-playfair' })
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin', 'latin-ext'], variable: '--font-jetbrains' })
 
 export default function GlobalError({
   retry,

@@ -1,16 +1,35 @@
 import type { Metadata } from 'next'
-import { useTranslations } from 'next-intl'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 import FadeIn from '@/components/FadeIn'
+import { buildMetadata } from '@/lib/seo'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('metadata')
-  return { title: t('about_title') }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const [t, tAbout] = await Promise.all([
+    getTranslations({ locale, namespace: 'metadata' }),
+    getTranslations({ locale, namespace: 'about' }),
+  ])
+  return buildMetadata({
+    locale,
+    path: '/about',
+    title: t('about_title'),
+    description: tAbout('s1_p1'),
+  })
 }
 
-export default function AboutPage() {
-  const t = useTranslations('about')
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations('about')
 
   return (
     <div className="max-w-5xl mx-auto px-6">

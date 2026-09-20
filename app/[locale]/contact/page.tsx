@@ -1,18 +1,36 @@
 import type { Metadata } from 'next'
-import { useTranslations } from 'next-intl'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import FadeIn from '@/components/FadeIn'
 import ContactForm from '@/components/ContactForm'
 import { siteConfig } from '@/data/site'
+import { buildMetadata } from '@/lib/seo'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('metadata')
-  return { title: t('contact_title') }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const [t, tContact] = await Promise.all([
+    getTranslations({ locale, namespace: 'metadata' }),
+    getTranslations({ locale, namespace: 'contact' }),
+  ])
+  return buildMetadata({
+    locale,
+    path: '/contact',
+    title: t('contact_title'),
+    description: tContact('subtitle'),
+  })
 }
 
-export default function ContactPage() {
-  const t = useTranslations('contact')
-  const tf = useTranslations('footer')
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  setRequestLocale(locale)
+  const [t, tf] = await Promise.all([getTranslations('contact'), getTranslations('footer')])
 
   const contactLinks = [
     { label: 'GitHub', href: siteConfig.github, mono: 'github.com/berkaykose' },

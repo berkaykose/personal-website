@@ -1,12 +1,26 @@
 import type { Metadata } from 'next'
-import { getTranslations, getLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { projects, type Project, type ProjectStatus } from '@/data/projects'
 import FadeIn from '@/components/FadeIn'
 import ProjectScreenshot from '@/components/ProjectScreenshot'
+import { buildMetadata } from '@/lib/seo'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('metadata')
-  return { title: t('projects_title') }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const [t, tProjects] = await Promise.all([
+    getTranslations({ locale, namespace: 'metadata' }),
+    getTranslations({ locale, namespace: 'projects' }),
+  ])
+  return buildMetadata({
+    locale,
+    path: '/projects',
+    title: t('projects_title'),
+    description: tProjects('subtitle'),
+  })
 }
 
 const featuredSpecs = [
@@ -50,12 +64,15 @@ function Placeholder({ letter }: { letter: string }) {
   )
 }
 
-export default async function ProjectsPage() {
-  const [t, tHome, locale] = await Promise.all([
-    getTranslations('projects'),
-    getTranslations('home'),
-    getLocale(),
-  ])
+export default async function ProjectsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  setRequestLocale(locale)
+
+  const [t, tHome] = await Promise.all([getTranslations('projects'), getTranslations('home')])
 
   const loc = locale as 'tr' | 'en'
 

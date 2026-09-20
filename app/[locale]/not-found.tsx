@@ -4,7 +4,7 @@ import NotFoundContent from '@/components/NotFoundContent'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('metadata')
-  return { title: t('not_found_title') }
+  return { title: t('not_found_title'), robots: { index: false } }
 }
 
 export default function NotFound() {

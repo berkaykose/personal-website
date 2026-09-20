@@ -8,7 +8,7 @@ import NotFoundContent from '@/components/NotFoundContent'
 // (bkz. app/[locale]/writing/[slug]/page.tsx'teki aynı çözüm).
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('metadata')
-  return { title: t('not_found_title') }
+  return { title: t('not_found_title'), robots: { index: false } }
 }
 
 export default function CatchAll() {
