@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 import FadeIn from '@/components/FadeIn'
+import ExperienceTimeline from '@/components/ExperienceTimeline'
+import { experience } from '@/data/experience'
 import { buildMetadata } from '@/lib/seo'
 
 export async function generateMetadata({
@@ -97,9 +99,14 @@ export default async function AboutPage({
             </p>
           </div>
 
-          <p className="max-w-xl text-base md:text-lg text-zinc-600 leading-relaxed">
+          <p className="max-w-xl text-base md:text-lg text-zinc-600 leading-relaxed mb-14">
             {t('s2_p4')}
           </p>
+
+          <div className="font-mono text-[11px] tracking-[0.1em] text-accent mb-6">
+            {t('s2_experience_label')}
+          </div>
+          <ExperienceTimeline entries={experience} locale={locale as 'tr' | 'en'} />
         </section>
       </FadeIn>
 
