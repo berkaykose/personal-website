@@ -2,25 +2,171 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111111;
+  --muted: #5f6068;
+  --border: #e4e4e7;
+  --neon-orange: #ff6a00;
 }
 
+/* Tailwind v4'te konfigürasyon JS dosyası yerine burada @theme ile yapılır.
+   CSS değişkeni tanımları Tailwind utility class'larına dönüşür:
+   --color-accent → bg-accent, text-accent, border-accent */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-muted: var(--muted);
+  --color-border: var(--border);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Haki/zeytun yeşili vurgu rengi */
+  --color-accent: #6b7533;
+  --color-accent-light: #f2f3e8;
+
+  /* next/font'un html elementine enjekte ettiği CSS değişkenlerini
+     Tailwind font-* utility'leriyle ilişkilendiriyoruz. */
+  --font-sans: var(--font-instrument-sans), system-ui, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-mono: var(--font-jetbrains), 'Courier New', monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  /* Instrument Sans "UI typography" hissini biraz azaltmak için hafif negatif
+     tracking — serif başlıkların yanında body copy'nin editorial durması için. */
+  letter-spacing: -0.011em;
+  overflow-x: hidden;
+}
+
+/* Klavye ile gezinirken görünen focus göstergesi — tarayıcının varsayılan
+   mavi outline'ı yerine site paletiyle (olive) tutarlı bir gösterge. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Hero'daki terminal imleci, ambient "matrix" akışları ve scroll ipucu için */
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.blink-cursor {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes fall-down {
+  from { transform: translateY(-30%); }
+  to { transform: translateY(30%); }
+}
+.fall-stream {
+  animation: fall-down 18s linear infinite;
+  /* vertical-rl varsayılanda harfleri yan çevirir, rakamları dik bırakır
+     (Unicode vertical orientation farkı) — karışık sonucu önlemek için
+     tüm karakterleri dik tutuyoruz, aynı yatay metin gibi görünsün diye. */
+  text-orientation: upright;
+}
+
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.9; }
+}
+.scroll-line {
+  animation: scroll-pulse 2.2s ease-in-out infinite;
+}
+
+/* app/[locale]/loading.tsx için: route geçişi sırasında görünen tam sayfa
+   loading state'i. BK monogramı hafifçe pulse eder, çizgi indeterminate
+   olarak sağa doğru akar (gerçek bir yüzdeye bağlamak web navigasyonunda
+   anlamsız olduğu için). */
+@keyframes loading-bk-pulse {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 1; }
+}
+.loading-bk {
+  animation: loading-bk-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes loading-sweep {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(330%); }
+}
+.loading-line {
+  position: relative;
+  width: 180px;
+  height: 1px;
+  overflow: hidden;
+  background: var(--border);
+}
+.loading-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: var(--color-accent);
+  animation: loading-sweep 1.1s ease-in-out infinite;
+}
+
+/* Sayfa çoğunlukla ~200ms altında hazır oluyor — bu durumda loading state'i
+   hiç görünmeden kaybolsun diye ilk 200ms boyunca opacity:0 tutup öyle
+   fade-in yapıyoruz. Gerçekten yavaş yüklenen nadir durumda kullanıcı
+   200ms'lik gecikmeyi fark etmez. */
+@keyframes loading-delayed-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.loading-container {
+  animation: loading-delayed-fade-in 0.25s ease-out 0.2s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink-cursor,
+  .fall-stream,
+  .scroll-line,
+  .loading-bk,
+  .loading-line::after {
+    animation: none;
+  }
+  .loading-container {
+    animation: none;
+  }
+}
+
+/* Özel imleç: normal ok imleci + hafif turuncu neon parıltı (SVG cursor).
+   Sadece fare olan cihazlarda uygulanır, dokunmatikte varsayılan kalır. */
+@media (pointer: fine) {
+  * {
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cfilter id='glow' x='-100%25' y='-100%25' width='300%25' height='300%25'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='1' flood-color='%23ff6a00' flood-opacity='0.55'/%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='2.2' flood-color='%23ff6a00' flood-opacity='0.3'/%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M3 2 L3 23 L8 18.3 L12 26.5 L15.3 24.9 L11.3 16.6 L18 16.6 Z' fill='%23ffffff' stroke='%23111111' stroke-width='0.4' stroke-linejoin='round' filter='url(%23glow)'/%3E%3C/svg%3E")
+      2 2,
+      auto !important;
+  }
+
+  /* Tıklanabilir elemanlarda el işareti göster. Emoji/metin içeren SVG cursor'lar
+     tarayıcıların cursor-rendering pipeline'ında güvenilir çalışmadığı için
+     (arrow'daki gibi salt vektör path değil), burada tarayıcının kendi native
+     el işaretine güveniyoruz — her yerde garanti çalışır. */
+  a, button, [role='button'], label, select, summary {
+    cursor: pointer !important;
+  }
+
+  /* Yukarıdaki evrensel `*` kuralı her elemanı doğrudan hedeflediği için,
+     bir linkin/butonun İÇİNDEKİ elemanlar (başlık, span, img...) miras yerine
+     kendi doğrudan kuralını alıp ok imlecine dönüyordu. Tüm alt elemanları
+     ebeveynin imlecini miras almaya zorluyoruz. */
+  a *, button * {
+    cursor: inherit !important;
+  }
+}
+
+/* Navbar'ın hemen altındaki hafif turuncu neon çizgi */
+.navbar-neon-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: rgba(255, 106, 0, 0.6);
+  box-shadow:
+    0 0 2px 0.5px rgba(255, 106, 0, 0.4),
+    0 0 6px 1px rgba(255, 106, 0, 0.2);
+  pointer-events: none;
 }
