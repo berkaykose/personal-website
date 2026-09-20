@@ -34,7 +34,7 @@ export default async function ContactPage({
 
   const contactLinks = [
     { label: 'GitHub', href: siteConfig.github, mono: 'github.com/berkaykose' },
-    { label: 'LinkedIn', href: siteConfig.linkedin, mono: 'linkedin.com/in/berkaykose' },
+    { label: 'LinkedIn', href: siteConfig.linkedin, mono: 'linkedin.com/in/berkaykse' },
     { label: tf('email'), href: `mailto:${siteConfig.email}`, mono: siteConfig.email },
   ]
 
