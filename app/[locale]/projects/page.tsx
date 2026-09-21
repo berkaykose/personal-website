@@ -23,9 +23,9 @@ export async function generateMetadata({
   })
 }
 
-const featuredSpecs = [
-  { id: 'toast-notification-builder', category: 'frontend' as const },
-  { id: 'inventory-api', category: 'backend' as const },
+const featuredSpecs: { id: string; category: 'frontend' | 'backend' }[] = [
+  { id: 'portfolio', category: 'frontend' },
+  { id: 'toast-notification-builder', category: 'frontend' },
 ]
 
 const statusColor: Record<ProjectStatus, string> = {
@@ -156,12 +156,7 @@ export default async function ProjectsPage({
                 <div className="flex-1 w-full">
                   <div className="relative aspect-video rounded-md overflow-hidden bg-accent-light transition-transform duration-300 hover:scale-[1.02]">
                     {project.screenshot ? (
-                      <ProjectScreenshot
-                        src={project.screenshot}
-                        alt={title}
-                        objectPosition={project.id === 'inventory-api' ? 'center' : 'top'}
-                        zoom={project.id === 'inventory-api' ? 1 : 1.2}
-                      />
+                      <ProjectScreenshot src={project.screenshot} alt={title} />
                     ) : (
                       <Placeholder letter={title.charAt(0)} />
                     )}

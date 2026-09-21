@@ -35,12 +35,7 @@ export default function FeaturedProjects({ locale }: Props) {
             >
               <div className="relative aspect-video bg-accent-light overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
                 {project.screenshot ? (
-                  <ProjectScreenshot
-                    src={project.screenshot}
-                    alt={title}
-                    objectPosition={project.id === 'inventory-api' ? 'center' : 'top'}
-                    zoom={project.id === 'inventory-api' ? 1 : 1.2}
-                  />
+                  <ProjectScreenshot src={project.screenshot} alt={title} />
                 ) : (
                   <>
                     {/* Gerçek bir ekran görüntüsü yok — yer tutucu: baş harf + nokta deseni */}

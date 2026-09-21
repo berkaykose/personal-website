@@ -40,34 +40,20 @@ export const projects: Project[] = [
     id: 'portfolio',
     title: { tr: 'Kişisel Portföy Sitesi', en: 'Personal Portfolio' },
     description: {
-      tr: 'React/Next.js öğrenme sürecimin bir parçası olarak geliştirdiğim bu site. App Router, Server Components, Server Actions ve Tailwind CSS v4 kullanıyor.',
-      en: 'This portfolio site, built as part of my React/Next.js learning journey. Uses App Router, Server Components, Server Actions, and Tailwind CSS v4.',
+      tr: 'Next.js App Router, Server Components/Actions ve Supabase (Postgres + Auth) ile geliştirdiğim, İngilizce/Türkçe içerik yönetimi olan bu site. Kendi admin panelinden yazılar yayınlıyorum.',
+      en: 'This site, built with Next.js App Router, Server Components/Actions and Supabase (Postgres + Auth) — bilingual content management with my own admin panel for publishing articles.',
     },
-    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
-    github: 'https://github.com/berkaykose/portfolio',
-    year: 2025,
+    tags: ['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS', 'Vercel'],
+    github: 'https://github.com/berkaykose/personal-website',
+    // live: 'https://berkaykose.dev', — domain henüz aktif edilmedi, o zamana
+    // kadar "View Project" GitHub repo'ya gitsin (href = project.live ?? project.github).
+    year: 2026,
     status: 'in-progress',
-    oneLiner: {
-      tr: 'Modern React/Next.js kalıplarını öğrenmek ve sergilemek için geliştirdiğim kişisel portföy sitesi.',
-      en: 'A personal portfolio built to learn and showcase modern React/Next.js patterns.',
-    },
-  },
-  {
-    id: 'inventory-api',
-    title: { tr: 'Envanter Yönetim API\'si', en: 'Inventory Management API' },
-    description: {
-      tr: 'Spring Boot ile geliştirilen RESTful API. JWT authentication, rol tabanlı yetkilendirme ve PostgreSQL ile stok takibi sağlıyor. Docker Compose ile çalıştırılabilir.',
-      en: 'A RESTful API built with Spring Boot. Features JWT authentication, role-based authorization, and stock tracking with PostgreSQL. Runnable with Docker Compose.',
-    },
-    tags: ['Java', 'Spring Boot', 'PostgreSQL', 'JWT', 'Docker'],
-    github: 'https://github.com/berkaykose/inventory-api',
-    year: 2024,
-    status: 'completed',
     featured: true,
-    screenshot: '/projects/inventory-api.png',
+    screenshot: '/projects/portfolio.png',
     oneLiner: {
-      tr: 'JWT kimlik doğrulama ve rol tabanlı yetkilendirmeye sahip güvenli bir RESTful envanter API\'si.',
-      en: 'A secure RESTful inventory API with JWT authentication and role-based access control.',
+      tr: 'Kendi admin panelim ve Supabase destekli içerik yönetimiyle geliştirdiğim kişisel portföy sitesi.',
+      en: 'My personal portfolio, with its own admin panel and Supabase-backed content management.',
     },
   },
   {
