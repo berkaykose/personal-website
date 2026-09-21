@@ -7,7 +7,7 @@ export default function LanguageSwitcher() {
   const pathname = usePathname()
 
   return (
-    <div className="flex items-center border border-border rounded-full overflow-hidden font-mono text-xs select-none">
+    <div className="inline-flex items-center border border-border rounded-full overflow-hidden font-mono text-xs select-none">
       <Link
         href={pathname}
         locale="tr"
