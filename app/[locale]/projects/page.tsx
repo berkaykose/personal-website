@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { projects, type Project, type ProjectStatus } from '@/data/projects'
+import { fetchArchiveProjects, fetchShowcaseProjects } from '@/lib/projects/api'
+import type { ProjectStatus, PublicProject } from '@/lib/projects/types'
 import FadeIn from '@/components/FadeIn'
 import ProjectScreenshot from '@/components/ProjectScreenshot'
 import { buildMetadata } from '@/lib/seo'
+
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
   params,
@@ -23,11 +26,6 @@ export async function generateMetadata({
   })
 }
 
-const featuredSpecs: { id: string; category: 'frontend' | 'backend' }[] = [
-  { id: 'portfolio', category: 'frontend' },
-  { id: 'toast-notification-builder', category: 'frontend' },
-]
-
 const statusColor: Record<ProjectStatus, string> = {
   completed: 'text-accent',
   'in-progress': 'text-[var(--neon-orange)]',
@@ -35,7 +33,7 @@ const statusColor: Record<ProjectStatus, string> = {
 }
 
 function statusLabel(
-  project: Project,
+  project: PublicProject,
   t: (key: 'status_planned' | 'status_in_progress' | 'status_completed') => string
 ) {
   if (project.status === 'planned') return t('status_planned')
@@ -72,25 +70,14 @@ export default async function ProjectsPage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [t, tHome] = await Promise.all([getTranslations('projects'), getTranslations('home')])
+  const [t, tHome, showcase, archive] = await Promise.all([
+    getTranslations('projects'),
+    getTranslations('home'),
+    fetchShowcaseProjects(locale),
+    fetchArchiveProjects(locale),
+  ])
 
-  const loc = locale as 'tr' | 'en'
-
-  const featured = featuredSpecs
-    .map((spec) => {
-      const project = projects.find((p) => p.id === spec.id)
-      return project ? { project, category: spec.category } : null
-    })
-    .filter((entry): entry is { project: Project; category: 'frontend' | 'backend' } => entry !== null)
-
-  const featuredIds = new Set(featured.map((entry) => entry.project.id))
-  const archive = projects
-    .filter((p) => !featuredIds.has(p.id))
-    .sort((a, b) => {
-      if (a.status === 'planned' && b.status !== 'planned') return 1
-      if (b.status === 'planned' && a.status !== 'planned') return -1
-      return b.year - a.year
-    })
+  const totalCount = showcase.length + archive.length
 
   return (
     <div className="max-w-5xl mx-auto px-6">
@@ -107,18 +94,18 @@ export default async function ProjectsPage({
               <p className="text-lg text-muted max-w-lg">{t('subtitle')}</p>
             </div>
             <span className="font-mono text-xs text-zinc-400 shrink-0 mt-8">
-              {t('count', { count: projects.length })}
+              {t('count', { count: totalCount })}
             </span>
           </div>
         </section>
       </FadeIn>
 
-      {featured.map(({ project, category }, index) => {
-        const title = project.title[loc] ?? project.title.tr
-        const description = project.description[loc] ?? project.description.tr
+      {showcase.map((project, index) => {
         const stack = project.tags.join(' · ')
-        const href = project.live ?? project.github
-        const categoryLabel = (category === 'frontend' ? tHome('frontend_label') : tHome('backend_label')).toUpperCase()
+        const href = project.liveUrl ?? project.githubUrl
+        const categoryLabel = (
+          project.category === 'frontend' ? tHome('frontend_label') : tHome('backend_label')
+        ).toUpperCase()
         const reversed = index % 2 === 1
 
         return (
@@ -133,12 +120,12 @@ export default async function ProjectsPage({
                 </span>
               </div>
 
-              <h2 className="font-display text-3xl md:text-4xl font-bold mb-10">{title}</h2>
+              <h2 className="font-display text-3xl md:text-4xl font-bold mb-10">{project.title}</h2>
 
               <div className={`flex flex-col md:flex-row gap-10 md:gap-16 items-center ${reversed ? 'md:flex-row-reverse' : ''}`}>
                 <div className="flex-1 w-full">
                   <p className="text-base md:text-lg text-zinc-600 leading-relaxed mb-6 max-w-md">
-                    {description}
+                    {project.description}
                   </p>
                   <p className="font-mono text-xs text-muted mb-8">{stack}</p>
                   {href && (
@@ -155,10 +142,15 @@ export default async function ProjectsPage({
 
                 <div className="flex-1 w-full">
                   <div className="relative aspect-video rounded-md overflow-hidden bg-accent-light transition-transform duration-300 hover:scale-[1.02]">
-                    {project.screenshot ? (
-                      <ProjectScreenshot src={project.screenshot} alt={title} />
+                    {project.screenshotUrl ? (
+                      <ProjectScreenshot
+                        src={project.screenshotUrl}
+                        alt={project.title}
+                        width={project.screenshotWidth}
+                        height={project.screenshotHeight}
+                      />
                     ) : (
-                      <Placeholder letter={title.charAt(0)} />
+                      <Placeholder letter={project.title.charAt(0)} />
                     )}
                   </div>
                 </div>
@@ -169,23 +161,22 @@ export default async function ProjectsPage({
       })}
 
       {archive.length > 0 && (
-        <FadeIn delay={100 + featured.length * 50}>
+        <FadeIn delay={100 + showcase.length * 50}>
           <section className="border-t border-border py-16">
             <h2 className="font-mono text-xs text-muted tracking-widest uppercase mb-8">
               {t('archive_label')}
             </h2>
             <div className="divide-y divide-border border-t border-b border-border">
               {archive.map((project, index) => {
-                const title = project.title[loc] ?? project.title.tr
-                const href = project.live ?? project.github
+                const href = project.liveUrl ?? project.githubUrl
                 const stack = project.tags.slice(0, 2).join(' · ')
-                const number = String(featured.length + index + 1).padStart(2, '0')
+                const number = String(showcase.length + index + 1).padStart(2, '0')
 
                 const row = (
                   <div className="flex items-center gap-4 sm:gap-6 py-5">
                     <span className="font-mono text-xs text-zinc-400 w-6 shrink-0">{number}</span>
                     <span className="flex-1 font-medium group-hover:text-accent transition-colors duration-200">
-                      {title}
+                      {project.title}
                     </span>
                     <span className="hidden sm:inline font-mono text-xs text-zinc-500 shrink-0 w-40">
                       {stack}
@@ -195,7 +186,7 @@ export default async function ProjectsPage({
                     >
                       {statusLabel(project, t)}
                     </span>
-                    {href && <span className="text-accent shrink-0">→</span>}
+                    {href && <span className="text-accent shrink-0">↗</span>}
                   </div>
                 )
 

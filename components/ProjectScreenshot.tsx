@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
@@ -7,11 +7,11 @@ import Image from 'next/image'
 interface Props {
   src: string
   alt: string
-  objectPosition?: 'top' | 'center'
-  zoom?: number
+  width?: number | null
+  height?: number | null
 }
 
-export default function ProjectScreenshot({ src, alt, objectPosition = 'top', zoom = 1.2 }: Props) {
+export default function ProjectScreenshot({ src, alt, width, height }: Props) {
   const t = useTranslations('common')
   const [open, setOpen] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -44,16 +44,29 @@ export default function ProjectScreenshot({ src, alt, objectPosition = 'top', zo
         type="button"
         onClick={() => setOpen(true)}
         aria-label={alt}
-        className="group relative block w-full h-full overflow-hidden"
+        className="group relative flex items-center justify-center w-full h-full p-6"
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="(min-width: 768px) 33vw, 100vw"
-          style={{ '--zoom': zoom, '--zoom-hover': zoom + 0.04 } as CSSProperties}
-          className={`object-cover ${objectPosition === 'top' ? 'object-top' : 'object-center'} pointer-events-none grayscale scale-[var(--zoom)] transition-all duration-200 group-hover:scale-[var(--zoom-hover)] group-hover:grayscale-0`}
-        />
+        {width && height ? (
+          // Gerçek en/boy oranıyla, boyutlandırılmış (fill değil) bir <img> —
+          // border/shadow bu sayede kutuya değil, görselin gerçek kenarlarına sarıyor.
+          <Image
+            src={src}
+            alt={alt}
+            width={width}
+            height={height}
+            sizes="(min-width: 768px) 33vw, 100vw"
+            className="max-w-full max-h-full w-auto h-auto border border-black/[0.08] shadow-[0_14px_35px_rgba(0,0,0,0.06)] pointer-events-none grayscale transition-all duration-200 group-hover:grayscale-0"
+          />
+        ) : (
+          // Eski (boyutsuz) ekran görüntüleri için geriye dönük uyumluluk.
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(min-width: 768px) 33vw, 100vw"
+            className="object-contain pointer-events-none grayscale transition-all duration-200 group-hover:grayscale-0"
+          />
+        )}
       </button>
 
       {open && createPortal(

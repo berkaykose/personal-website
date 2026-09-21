@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
     // %20-30 daha küçük dosya, next/image otomatik olarak Accept header'ına
     // göre en uygununu seçiyor.
     formats: ['image/avif', 'image/webp'],
+    // Proje ekran görüntüleri artık Supabase Storage'dan (public bucket) geliyor.
+    remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' }],
   },
   poweredByHeader: false,
 }

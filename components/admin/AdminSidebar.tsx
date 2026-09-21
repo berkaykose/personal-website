@@ -3,7 +3,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logoutAction } from '@/app/admin/actions'
 
-const navItems = [{ href: '/admin/articles', label: 'Articles' }]
+const navItems = [
+  { href: '/admin/articles', label: 'Articles' },
+  { href: '/admin/projects', label: 'Projects' },
+]
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -38,12 +41,6 @@ export default function AdminSidebar() {
               </Link>
             )
           })}
-          <span className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-zinc-300 cursor-default select-none">
-            Projects
-            <span className="font-mono text-[9px] tracking-wider uppercase text-zinc-300">
-              Soon
-            </span>
-          </span>
         </nav>
       </div>
 
