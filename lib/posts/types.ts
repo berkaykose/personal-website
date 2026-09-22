@@ -1,6 +1,6 @@
 import type { RenderableBlock } from '@/components/ContentBlockRenderer'
 
-export type PostCategory = 'frontend' | 'backend'
+export type PostCategory = string
 
 export interface PublicArticle {
   slug: string

@@ -9,7 +9,9 @@ export type Locale = 'en' | 'tr'
 
 export type ArticleStatus = 'draft' | 'published'
 
-export type ArticleCategory = 'frontend' | 'backend'
+// Categories are intentionally free-form. The admin editor offers common suggestions,
+// but a post can also belong to a category such as "DevOps" or "Hayat Tecrübeleri".
+export type ArticleCategory = string
 
 export interface ArticleTranslation {
   locale: Locale

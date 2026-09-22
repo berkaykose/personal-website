@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { fetchPublishedArticles } from '@/lib/posts/api'
 import { formatPostDate } from '@/lib/formatDate'
+import { formatArticleCategory } from '@/lib/posts/categories'
 
 interface Props {
   locale: string
@@ -24,9 +25,7 @@ export default async function BlogPreview({ locale }: Props) {
 
       <div className="divide-y divide-border border-t border-b border-border mb-8">
         {latest.map((article) => {
-          const categoryLabel = tHome(
-            `${article.category}_label` as 'backend_label' | 'frontend_label'
-          )
+          const categoryLabel = formatArticleCategory(article.category, locale)
 
           return (
             <Link

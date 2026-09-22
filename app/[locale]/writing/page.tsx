@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { fetchPublishedArticles } from '@/lib/posts/api'
 import { formatPostDate } from '@/lib/formatDate'
+import { formatArticleCategory } from '@/lib/posts/categories'
 import FadeIn from '@/components/FadeIn'
 import { buildMetadata } from '@/lib/seo'
 
@@ -23,9 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function WritingPage() {
-  const [t, tHome, locale] = await Promise.all([
+  const [t, locale] = await Promise.all([
     getTranslations('writing'),
-    getTranslations('home'),
     getLocale(),
   ])
 
@@ -57,9 +57,7 @@ export default async function WritingPage() {
       ) : (
         <div className="border-t border-border">
           {articles.map((article, index) => {
-            const categoryLabel = tHome(
-              `${article.category}_label` as 'frontend_label' | 'backend_label'
-            ).toUpperCase()
+            const categoryLabel = formatArticleCategory(article.category, locale).toLocaleUpperCase(locale)
 
             return (
               <FadeIn key={article.slug} delay={index * 80}>

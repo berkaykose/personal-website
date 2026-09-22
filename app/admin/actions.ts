@@ -9,6 +9,7 @@ import {
   type ProjectFormValues,
 } from '@/lib/admin/projects'
 import { createClient } from '@/lib/supabase/server'
+import { normalizeArticleCategory } from '@/lib/posts/categories'
 import type { ArticleCategory, ArticleTranslation, Locale } from '@/lib/admin/types'
 
 const LOCALES: Locale[] = ['en', 'tr']
@@ -18,6 +19,11 @@ export async function saveArticle(
   category: ArticleCategory,
   translations: Partial<Record<Locale, ArticleTranslation>>
 ): Promise<{ error?: string } | undefined> {
+  const normalizedCategory = normalizeArticleCategory(category)
+  if (!normalizedCategory) {
+    return { error: 'Please enter a category of up to 80 characters.' }
+  }
+
   let currentId = id
   try {
     for (const locale of LOCALES) {
@@ -25,9 +31,9 @@ export async function saveArticle(
       if (!translation) continue
 
       if (currentId) {
-        await updateArticle(currentId, translation, category)
+        await updateArticle(currentId, translation, normalizedCategory)
       } else {
-        const created = await createArticle(translation, category)
+        const created = await createArticle(translation, normalizedCategory)
         currentId = created.id
       }
     }

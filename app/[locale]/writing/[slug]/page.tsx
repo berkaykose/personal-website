@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
-import { fetchPublishedArticleBySlug, fetchPublishedArticles } from '@/lib/posts/api'
+import {
+  fetchPublishedAlternateSlug,
+  fetchPublishedArticleBySlug,
+  fetchPublishedArticles,
+} from '@/lib/posts/api'
 import { formatPostDate } from '@/lib/formatDate'
+import { formatArticleCategory } from '@/lib/posts/categories'
 import FadeIn from '@/components/FadeIn'
 import NotFoundContent from '@/components/NotFoundContent'
 import ContentBlockRenderer from '@/components/ContentBlockRenderer'
@@ -39,19 +45,20 @@ export default async function WritingPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const [t, tHome, tNav, locale] = await Promise.all([
+  const [t, tNav, locale] = await Promise.all([
     getTranslations('writing'),
-    getTranslations('home'),
     getTranslations('nav'),
     getLocale(),
   ])
 
   const article = await fetchPublishedArticleBySlug(locale, slug)
-  if (!article) return <NotFoundContent />
+  if (!article) {
+    const alternateSlug = await fetchPublishedAlternateSlug(slug, locale)
+    if (alternateSlug) redirect(`/writing/${alternateSlug}`)
+    return <NotFoundContent />
+  }
 
-  const categoryLabel = tHome(
-    `${article.category}_label` as 'frontend_label' | 'backend_label'
-  ).toUpperCase()
+  const categoryLabel = formatArticleCategory(article.category, locale).toLocaleUpperCase(locale)
 
   const all = await fetchPublishedArticles(locale)
   const currentIndex = all.findIndex((a) => a.slug === slug)

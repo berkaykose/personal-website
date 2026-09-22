@@ -6,7 +6,7 @@
 
 create table articles (
   id bigint generated always as identity primary key,
-  category text not null default 'backend' check (category in ('frontend', 'backend')),
+  category text not null default 'Backend' check (char_length(btrim(category)) between 1 and 80),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

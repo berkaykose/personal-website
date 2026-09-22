@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { deleteArticle, saveArticle } from '@/app/admin/actions'
 import ContentBlockRenderer from '@/components/ContentBlockRenderer'
+import { ARTICLE_CATEGORY_SUGGESTIONS } from '@/lib/posts/categories'
 import type {
   AdminArticle,
   AdminContentBlock,
@@ -19,11 +20,6 @@ interface Props {
 const LOCALES: { value: Locale; label: string }[] = [
   { value: 'en', label: 'English' },
   { value: 'tr', label: 'Türkçe' },
-]
-
-const CATEGORIES: { value: ArticleCategory; label: string }[] = [
-  { value: 'backend', label: 'Backend' },
-  { value: 'frontend', label: 'Frontend' },
 ]
 
 function emptyTranslation(locale: Locale): ArticleTranslation {
@@ -47,7 +43,7 @@ function blockDefaults(type: AdminContentBlock['type']): AdminContentBlock {
 
 export default function ArticleEditor({ mode, article }: Props) {
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
-  const [category, setCategory] = useState<ArticleCategory>(article?.category ?? 'backend')
+  const [category, setCategory] = useState<ArticleCategory>(article?.category ?? 'Backend')
   const [translations, setTranslations] = useState<Record<Locale, ArticleTranslation>>({
     en: article?.translations.en ?? emptyTranslation('en'),
     tr: article?.translations.tr ?? emptyTranslation('tr'),
@@ -190,17 +186,24 @@ export default function ArticleEditor({ mode, article }: Props) {
         <label className="block font-mono text-xs tracking-widest uppercase text-muted mb-2">
           Category
         </label>
-        <select
+        <input
+          list="article-category-suggestions"
           value={category}
-          onChange={(e) => setCategory(e.target.value as ArticleCategory)}
+          onChange={(e) => setCategory(e.target.value)}
+          onBlur={() => setCategory((value) => value.trim().replace(/\s+/g, ' '))}
+          maxLength={80}
+          required
+          placeholder="Choose or enter a category"
           className="w-full px-4 py-3 text-sm border border-border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors"
-        >
-          {CATEGORIES.map(({ value, label }) => (
+        />
+        <datalist id="article-category-suggestions">
+          {ARTICLE_CATEGORY_SUGGESTIONS.map(({ value, label }) => (
             <option key={value} value={value}>
               {label}
             </option>
           ))}
-        </select>
+        </datalist>
+        <p className="mt-2 text-xs text-muted">Choose a suggestion or enter your own category.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
