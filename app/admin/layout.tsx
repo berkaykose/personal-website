@@ -6,6 +6,7 @@
 // next-intl'siz, sabit metinlerle.
 import type { Metadata } from 'next'
 import { Instrument_Sans, Playfair_Display, JetBrains_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import '../globals.css'
 
 const instrumentSans = Instrument_Sans({ subsets: ['latin', 'latin-ext'], variable: '--font-instrument-sans' })
@@ -23,7 +24,10 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
       lang="en"
       className={`${instrumentSans.variable} ${playfair.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground font-sans">{children}</body>
+      <body className="min-h-full bg-background text-foreground font-sans">
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
